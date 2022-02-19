@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
+using DSA.Excercises.Trees;
 
 namespace BinaryTrees
 {
-    public class BinaryTree
+    public class BinaryTree : ITree
     {
-        public Node Root { get; set; }
+        public INode Root { get; set; }
 
         public bool Find(int value)
         {
@@ -23,6 +25,34 @@ namespace BinaryTrees
         }
 
         public void Insert(int value)
+        {
+            var node = new Node(value);
+
+            if (Root == null)
+                Root = node;
+
+            else
+            {
+                var current = Root;
+                var random = new Random().Next(0, 1);
+                while (current != null)
+                {
+                    if (current.LeftChild == null || random == 0)
+                    {
+                        current.LeftChild = node;
+                        break;
+                    }
+
+                    else if (current.RightChild == null || random == 1)
+                    {
+                        current.RightChild = node;
+                        break;
+                    }
+                }
+            }
+        }
+
+        public void InsertBst(int value)
         {
             var node = new Node(value);
 
@@ -101,22 +131,76 @@ namespace BinaryTrees
 
         public bool IsBinarySearchTree()
         {
-            if (Root == null)
-                return false;
+            return IsBinarySearchTree(Root, int.MaxValue, int.MinValue);
+        }
 
-            var current = Root;
-            while (current != null)
+        public void SwapRoot()
+        {
+            var temp = Root.LeftChild;
+            Root.LeftChild = Root.RightChild;
+            Root.RightChild = temp;
+        }
+
+        public void NodesAtK(int k)
+        {
+            NodesAtK(Root, k);
+        }
+
+        public void GetNodesAtDistance(INode node, int distance, ref List<INode> nodes)
+        {
+            if (Height(node) == distance)
             {
-                if (current.LeftChild.Value > current.Value || current.RightChild.Value < current.Value)
-                    return false;
-                current = current.LeftChild;
+                nodes.Add(node);
+                return;
             }
+            GetNodesAtDistance(node.LeftChild, distance, ref nodes);
+            GetNodesAtDistance(node.RightChild, distance, ref nodes);
+        }
 
-            return true;
+        public void LevelOrderTraversal()
+        {
+            for (int i = Height(); i >= 0; i--)
+            {
+                List<INode> nodes = new List<INode>();
+                GetNodesAtDistance(Root, i, ref nodes);
+                foreach (INode node in nodes)
+                {
+                    Console.WriteLine(node.Value);
+                }
+            }
         }
 
         #region Private methods
-        private void InOrderTraversal(Node node)
+
+        private void NodesAtK(INode node, int k)
+        {
+            if (k == 0)
+            {
+                Console.WriteLine(node.Value);
+                return;
+            }
+
+            if (IsLeaf(node))
+            {
+                return;
+            }
+
+            k--;
+            NodesAtK(node.LeftChild, k);
+            NodesAtK(node.RightChild, k);
+        }
+
+        private bool IsBinarySearchTree(INode node, int max, int min)
+        {
+            if (node == null)
+                return true;
+
+            if (node.Value < min || node.Value > max)
+                return false;
+
+            return IsBinarySearchTree(node.LeftChild, node.Value - 1, min) && IsBinarySearchTree(node.RightChild, max, node.Value + 1);
+        }
+        private void InOrderTraversal(INode node)
         {
             if (node != null)
             {
@@ -126,7 +210,7 @@ namespace BinaryTrees
             }
         }
 
-        private void PreOrderTraversal(Node node)
+        private void PreOrderTraversal(INode node)
         {
             if (node != null)
             {
@@ -136,7 +220,7 @@ namespace BinaryTrees
             }
         }
 
-        private void PostOrderTraversal(Node node)
+        private void PostOrderTraversal(INode node)
         {
             if (node != null)
             {
@@ -146,7 +230,7 @@ namespace BinaryTrees
             }
         }
 
-        private int Height(Node node)
+        private int Height(INode node)
         {
             if (node == null) throw new ArgumentException("Node is null");
 
@@ -156,17 +240,17 @@ namespace BinaryTrees
             Math.Max(Height(node.LeftChild), Height(node.RightChild));
         }
 
-        private bool IsLeaf(Node node)
+        private bool IsLeaf(INode node)
         {
             return node.LeftChild == null && node.RightChild == null;
         }
 
-        private bool IsRoot(Node node)
+        private bool IsRoot(INode node)
         {
             return node == Root;
         }
 
-        private int Min(Node node)
+        private int Min(INode node)
         {
             if (IsLeaf(node)) return node.Value;
 
@@ -189,7 +273,7 @@ namespace BinaryTrees
         #endregion
     }
 
-    public class Node
+    public class Node : INode
     {
         public Node(int value)
         {
@@ -198,8 +282,8 @@ namespace BinaryTrees
 
         public int Value { get; set; }
 
-        public Node LeftChild { get; set; }
+        public INode LeftChild { get; set; }
 
-        public Node RightChild { get; set; }
+        public INode RightChild { get; set; }
     }
 }
