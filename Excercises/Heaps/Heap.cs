@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Linq;
 
 namespace DSA.Excercises.Heaps
 {
-    public class Heap
+    public abstract class Heap
     {
         public List<int> Values { get; set; }
         public Heap()
@@ -15,46 +13,63 @@ namespace DSA.Excercises.Heaps
             Values = new List<int>();
         }
 
-        public Heap(List<int> values)
+        public Heap(ICollection<int> values)
         {
             if (values == null || values.Count == 0)
                 throw new InvalidOperationException("The Values array is empty");
 
-            Values = values;
+            Values = values.ToList();
         }
 
-        public void Insert(int value)
+        public bool IsMaxHeap()
         {
-            Values.Add(value);
-            BubbleUp(Values.Count - 1);
+            return IsMaxHeap(0);
         }
 
-        public int Remove()
+        private bool IsMaxHeap(int index)
         {
-            int removedValue = Values[0];
-            Values[0] = Values[Values.Count - 1];
-            Values.RemoveAt(Values.Count - 1);
-            BubbleDown(0);
+            if (index >= Values.Count)
+                return true;
 
-            return removedValue;
+            bool isMaxHeap = IsValidParent(index);
+
+            var leftChildIndex = GetLeftChildIndex(index);
+            var rightChildIndex = GetRightChildIndex(index);
+
+            return isMaxHeap && IsMaxHeap(leftChildIndex) && IsMaxHeap(rightChildIndex);
         }
 
-        private int GetParentIndex(int index)
+        public abstract void Insert(int value);
+        public abstract int Remove();
+
+        public abstract int GetKthLargestElement(int k);
+
+        public T Clone<T>()
+        {
+            if (this == null)
+                return default;
+
+            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(this));
+        }
+
+        #region protected methods
+
+        protected int GetParentIndex(int index)
         {
             return Convert.ToInt32(Math.Ceiling(((double)(index - 2) / 2)));
         }
 
-        private int GetLeftChildIndex(int parentIndex)
+        protected int GetLeftChildIndex(int parentIndex)
         {
             return parentIndex * 2 + 1;
         }
 
-        private int GetRightChildIndex(int parentIndex)
+        protected int GetRightChildIndex(int parentIndex)
         {
             return parentIndex * 2 + 2;
         }
 
-        private bool IsValidParent(int index)
+        protected bool IsValidParent(int index)
         {
             if (!HasLeftChild(index))
                 return true;
@@ -67,18 +82,18 @@ namespace DSA.Excercises.Heaps
             return valid;
         }
 
-        private bool HasLeftChild(int index)
+        protected bool HasLeftChild(int index)
         {
             int leftChildIndex = GetLeftChildIndex(index);
             return leftChildIndex < Values.Count;
         }
 
-        private bool HasRightChild(int index)
+        protected bool HasRightChild(int index)
         {
             int rightChildIndex = GetRightChildIndex(index);
             return rightChildIndex < Values.Count;
         }
-        private int GetLargerChildIndex(int index)
+        protected int GetLargerChildIndex(int index)
         {
             int leftChildIndex = GetLeftChildIndex(index);
             int rightChildIndex = GetRightChildIndex(index);
@@ -92,7 +107,7 @@ namespace DSA.Excercises.Heaps
             return (Values[leftChildIndex] > Values[rightChildIndex]) ? leftChildIndex : rightChildIndex;
         }
 
-        private void BubbleUp(int current)
+        protected void BubbleUp(int current)
         {
             int parentIndex = GetParentIndex(current);
             if (parentIndex < 0)
@@ -106,7 +121,7 @@ namespace DSA.Excercises.Heaps
             return;
         }
 
-        private void BubbleDown(int current)
+        protected void BubbleDown(int current)
         {
             if (!IsValidParent(current))
             {
@@ -120,17 +135,13 @@ namespace DSA.Excercises.Heaps
             return;
         }
 
-        private void Swap(IList<int> list, int index1, int index2)
+        protected void Swap(IList<int> list, int index1, int index2)
         {
             var temp = list[index1];
             list[index1] = Values[index2];
             list[index2] = temp;
         }
 
-        public Heap Clone()
-        {
-            var serializedString = JsonConvert.SerializeObject(this);
-            return JsonConvert.DeserializeObject<Heap>(serializedString);
-        }
+        #endregion
     }
 }

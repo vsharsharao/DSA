@@ -5,8 +5,10 @@ using DSA.Excercises.AVLTrees;
 using HashTables;
 using Queues;
 using DSA.Excercises.Helpers;
-using DSA.Excercises.Heaps;
+using Heaps = DSA.Excercises.Heaps;
 using System.Linq;
+using DSA.Excercises.Tries;
+using DSA.Excercises.Graphs;
 
 namespace DSA
 {
@@ -16,27 +18,102 @@ namespace DSA
         {
             // BinaryTreeExcercises();
             // AvlTreeExcercises();
-            HeapExcercises();
+            // HeapExcercises();
+            // TrieExcercises();
+            GraphExcercises();
             Console.Read();
+        }
+
+        public static void GraphExcercises()
+        {
+            Graph graph = new Graph(false);
+            graph.AddNode("KA");
+            graph.AddNode("TN");
+            graph.AddNode("GOA");
+            graph.AddNode("KE");
+            graph.AddNode("AP");
+            graph.AddNode("TE");
+            graph.AddNode("MH");
+            graph.AddNode("UP");
+            graph.AddNode("MP");
+
+            graph.AddEdge("KA", "TN");
+            graph.AddEdge("KA", "GOA");
+            graph.AddEdge("KA", "AP");
+            graph.AddEdge("KA", "KE");
+            graph.AddEdge("KA", "TE");
+            graph.AddEdge("KA", "MH");
+            graph.AddEdge("TN", "KE");
+            graph.AddEdge("TN", "AP");
+            graph.AddEdge("MH", "MP");
+            graph.AddEdge("MH", "TE");
+            graph.AddEdge("AP", "TE");
+
+            graph.RemoveNode("TN");
+            graph.RemoveEdge("MH", "KA");
+
+            graph.Print();
+        }
+
+        public static void TrieExcercises()
+        {
+            Trie trie = new Trie();
+            trie.Insert("Cat");
+            trie.Insert("Boy");
+            trie.Insert("Book");
+            trie.Insert("Border");
+            trie.Insert("Bookworm");
+            trie.Insert("Batman");
+            trie.Insert("Caterpillar");
+            trie.Insert("Caramel");
+            trie.Insert("Camel");
+            trie.Insert("Pick");
+            trie.Insert("Pickle");
+            trie.Insert("chess");
+
+            // trie.Contains("cat");
+            // trie.PreOrderTraversal();
+            // trie.Remove("Pickle");
+            // var suggestions = trie.AutoComplete("c");
+            // Console.WriteLine(string.Join(", ", suggestions));
+            // Console.WriteLine(trie.ContainsRecursive("care"));
+            // Console.WriteLine(trie.CountWords());
+            Console.WriteLine(LongestCommonPrefix(new string[] { "canopy", "canon", "cannibalism" }));
         }
 
         public static void HeapExcercises()
         {
-            Heap heap = new Heap();
-            heap.Insert(15);
-            heap.Insert(10);
-            heap.Insert(3);
-            heap.Insert(8);
-            heap.Insert(12);
-            heap.Insert(9);
-            heap.Insert(4);
-            heap.Insert(1);
-            heap.Insert(24);
-            // heap.Remove();
-            var heapClone = heap.Clone();
+            // MaxHeap maxHeap = new MaxHeap();
+            // maxHeap.Insert(15);
+            // maxHeap.Insert(10);
+            // maxHeap.Insert(3);
+            // maxHeap.Insert(8);
+            // maxHeap.Insert(12);
+            // maxHeap.Insert(9);
+            // maxHeap.Insert(4);
+            // maxHeap.Insert(1);
+            // maxHeap.Insert(24);
+            // maxHeap.Remove();
+            // var heapClone = maxHeap.Clone<MaxHeap>();
+            // Console.WriteLine(string.Join(' ', HeapSort(maxHeap)));
+            // Console.WriteLine(string.Join(' ', HeapSort(heapClone, true)));
+            // int[] arr = new int[6] { 5, 3, 8, 4, 1, 2 };
+            // var heap = MaxHeap.Heapify(arr);
+            // var heap = new MaxHeap(arr);
+            // System.Console.WriteLine(heap.IsMaxHeap());
+            // Console.WriteLine(heap.GetKthLargestElement(2));
+            Heaps.PriorityQueue pQueue = new Heaps.PriorityQueue();
+            pQueue.EnQueue(5, "Five");
+            pQueue.EnQueue(23, "Twenty Three");
+            pQueue.EnQueue(47, "Forty Seven");
+            pQueue.EnQueue(1, "One");
+            pQueue.EnQueue(4, "Four");
+            pQueue.EnQueue(21, "Twenty One");
 
-            Console.WriteLine(string.Join(' ', HeapSort(heap)));
-            Console.WriteLine(string.Join(' ', HeapSort(heapClone, true)));
+            while (pQueue.Size != 0)
+            {
+                Console.WriteLine(pQueue.DeQueue());
+            }
         }
 
         public static void AvlTreeExcercises()
@@ -96,7 +173,7 @@ namespace DSA
             // ancestors.ForEach(i => Console.WriteLine(i));
         }
 
-        public static int[] HeapSort(Heap heap, bool descending = false)
+        public static int[] HeapSort(Heaps.Heap heap, bool descending = false)
         {
             if (heap == null)
                 throw new InvalidOperationException("Heap can't be nuill");
@@ -121,6 +198,12 @@ namespace DSA
             }
 
             return sortedArray;
+        }
+
+        public static string LongestCommonPrefix(string[] array)
+        {
+            Trie trie = new Trie(array);
+            return trie.LongestCommonPrefix();
         }
     }
 }
