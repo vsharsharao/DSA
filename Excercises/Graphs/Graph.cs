@@ -7,21 +7,18 @@ namespace DSA.Excercises.Graphs
     public class Graph
     {
         private readonly Dictionary<string, Node> _nodes;
-        private readonly Dictionary<Node, List<Node>> _adjacencyList;
         private readonly bool _directed;
 
         public Graph(bool directed = false)
         {
             _directed = directed;
             _nodes = new Dictionary<string, Node>();
-            _adjacencyList = new Dictionary<Node, List<Node>>();
 
         }
         public void AddNode(string label)
         {
             var node = new Node(label);
             _nodes.TryAdd(label, node);
-            _adjacencyList.Add(node, new List<Node>());
         }
 
         public void RemoveNode(string label)
@@ -41,20 +38,76 @@ namespace DSA.Excercises.Graphs
             if (!_nodes.TryGetValue(to, out Node toNode))
                 throw new ArgumentException();
 
-            _adjacencyList[fromNode].Remove(toNode);
+            fromNode.Edges.Remove(toNode);
 
             if (!_directed)
-                _adjacencyList[toNode].Remove(fromNode);
+                toNode.Edges.Remove(fromNode);
         }
 
-        private void RemoveAllEdges(Node node)
+        public void DepthFirstTraversal(string label)
         {
-            _adjacencyList.Remove(node);
-            foreach (var parentNode in _adjacencyList)
+            if (!_nodes.TryGetValue(label, out Node node))
+                return;
+
+            DepthFirstTraversal(node, new HashSet<Node>());
+        }
+
+        public void BreadthFirstTraversalUsing(string label)
+        {
+            if (!_nodes.TryGetValue(label, out Node node))
+                return;
+
+            Queue<Node> stack = new Queue<Node>();
+            HashSet<Node> visitedSet = new HashSet<Node>();
+            stack.Enqueue(node);
+
+            while (stack.Count != 0)
             {
-                if (parentNode.Value.Contains(node))
-                    parentNode.Value.Remove(node);
+                var current = stack.Dequeue();
+                if (visitedSet.Contains(current))
+                    continue;
+                visitedSet.Add(current);
+                Console.WriteLine(current);
+                if (current?.Edges?.Count > 0)
+                    current.Edges.ToList().ForEach(i => stack.Enqueue(i));
             }
+        }
+
+        public void DepthFirstTraversalUsingIteration(string label)
+        {
+            if (!_nodes.TryGetValue(label, out Node node))
+                return;
+
+            Stack<Node> stack = new Stack<Node>();
+            HashSet<Node> visitedSet = new HashSet<Node>();
+            stack.Push(node);
+
+            while (stack.Count != 0)
+            {
+                var current = stack.Pop();
+                visitedSet.Add(current);
+                Console.WriteLine(current);
+                if (current?.Edges?.Count > 0)
+                    current.Edges.Where(i => !visitedSet.Contains(i)).ToList().ForEach(i => stack.Push(i));
+            }
+        }
+
+        public List<string> TopologicalSort()
+        {
+            var sortedStack = new Stack<string>();
+            var visitedNodes = new HashSet<Node>();
+            List<string> sortedList = new List<string>();
+
+            foreach (var parentNode in _nodes.Values)
+                TopologicalSort(parentNode, visitedNodes, sortedStack);
+
+            if (sortedStack.Count > 0)
+            {
+                while (sortedStack.Count != 0)
+                    sortedList.Add(sortedStack.Pop());
+            }
+
+            return sortedList;
         }
 
         public void AddEdge(string from, string to)
@@ -65,19 +118,93 @@ namespace DSA.Excercises.Graphs
             if (!_nodes.TryGetValue(to, out Node toNode))
                 throw new ArgumentException();
 
-            _adjacencyList[fromNode].Add(toNode);
+            fromNode.Edges.Add(toNode);
 
             if (!_directed)
-                _adjacencyList[toNode].Add((fromNode));
+                toNode.Edges.Add(fromNode);
+
+        }
+
+        public bool HasCyclicSet()
+        {
+            List<Node> visitedNodes = new List<Node>();
+            foreach (Node node in _nodes.Values)
+            {
+                if (HasCyclicSet(node, _nodes.Values.ToList(), new List<Node>(), ref visitedNodes))
+                    return true;
+
+                else continue;
+            }
+
+            return false;
+        }
+
+        private bool HasCyclicSet(Node node, List<Node> allNodes, List<Node> visitingNodes, ref List<Node> visitedNodes)
+        {
+            bool hasCyclicSet = default;
+
+            allNodes.Remove(node);
+            visitingNodes.Add(node);
+
+            if (visitedNodes.Contains(node))
+                return false;
+
+            foreach (Node edge in node.Edges)
+            {
+                if (visitedNodes.Contains(edge))
+                    continue;
+
+                if (visitingNodes.Contains(edge))
+                    return true;
+
+                if (HasCyclicSet(edge, allNodes, visitingNodes, ref visitedNodes))
+                    return true;
+            }
+
+            visitedNodes.Add(node);
+            visitingNodes.Remove(node);
+
+            return false;
         }
 
         public void Print()
         {
-            foreach (var source in _adjacencyList.Keys)
+            foreach (var source in _nodes.Values)
             {
-                var targets = _adjacencyList[source];
-                if (targets?.Count > 0)
-                    targets.ForEach(i => Console.WriteLine($"{source} is sharing border with {i}"));
+                source.Edges.ForEach(i => Console.WriteLine($"{source} is sharing border with {i}"));
+            }
+        }
+
+        private void RemoveAllEdges(Node node)
+        {
+            foreach (var parentNode in _nodes.Values)
+            {
+                if (parentNode.Edges.Contains(node))
+                    parentNode.Edges.Remove(node);
+            }
+        }
+
+        private void TopologicalSort(Node node, HashSet<Node> visitedNodes, Stack<string> sortedStack)
+        {
+            if (visitedNodes.Contains(node))
+                return;
+
+            visitedNodes.Add(node);
+
+            foreach (var edge in node.Edges)
+                TopologicalSort(edge, visitedNodes, sortedStack);
+
+            sortedStack.Push(node.Label);
+        }
+
+        private void DepthFirstTraversal(Node node, HashSet<Node> nodeSet)
+        {
+            Console.WriteLine(node);
+            nodeSet.Add(node);
+            foreach (var edge in node.Edges)
+            {
+                if (!nodeSet.Contains(edge))
+                    DepthFirstTraversal(edge, nodeSet);
             }
         }
 
@@ -88,7 +215,7 @@ namespace DSA.Excercises.Graphs
                 Label = label;
             }
             public string Label { get; set; }
-            public List<Node> Edges { get; set; }
+            public List<Node> Edges { get; set; } = new List<Node>();
 
             public override string ToString()
             {

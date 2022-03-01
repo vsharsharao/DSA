@@ -20,39 +20,98 @@ namespace DSA
             // AvlTreeExcercises();
             // HeapExcercises();
             // TrieExcercises();
-            GraphExcercises();
+            // GraphExcercises();
+            WeightedGrapExcercises();
             Console.Read();
+        }
+
+        public static void WeightedGrapExcercises()
+        {
+            WeightedGraph graph = new WeightedGraph();
+            graph.AddNode("A");
+            graph.AddNode("B");
+            graph.AddNode("C");
+            graph.AddNode("D");
+            graph.AddNode("E");
+            graph.AddNode("F");
+            graph.AddNode("G");
+            graph.AddNode("H");
+
+            graph.AddEdge("A", "B", 2);
+            graph.AddEdge("B", "F", 4);
+            graph.AddEdge("F", "H", 1);
+            graph.AddEdge("A", "C", 1);
+            graph.AddEdge("D", "C", 3);
+            graph.AddEdge("D", "G", 2);
+            graph.AddEdge("D", "E", 1);
+            graph.AddEdge("G", "H", 1);
+            graph.AddEdge("B", "D", 1);
+            graph.AddEdge("E", "H", 1);
+            graph.GetShortestPathDistance("A", "H", out string shortestPath);
+            // graph.Print();
         }
 
         public static void GraphExcercises()
         {
-            Graph graph = new Graph(false);
-            graph.AddNode("KA");
-            graph.AddNode("TN");
-            graph.AddNode("GOA");
-            graph.AddNode("KE");
-            graph.AddNode("AP");
-            graph.AddNode("TE");
-            graph.AddNode("MH");
-            graph.AddNode("UP");
-            graph.AddNode("MP");
+            // Graph graph = new Graph(true);
+            // graph.AddNode("KA");
+            // graph.AddNode("TN");
+            // graph.AddNode("GOA");
+            // graph.AddNode("KE");
+            // graph.AddNode("AP");
+            // graph.AddNode("TE");
+            // graph.AddNode("MH");
+            // graph.AddNode("UP");
+            // graph.AddNode("MP");
 
-            graph.AddEdge("KA", "TN");
-            graph.AddEdge("KA", "GOA");
-            graph.AddEdge("KA", "AP");
-            graph.AddEdge("KA", "KE");
-            graph.AddEdge("KA", "TE");
-            graph.AddEdge("KA", "MH");
-            graph.AddEdge("TN", "KE");
-            graph.AddEdge("TN", "AP");
-            graph.AddEdge("MH", "MP");
-            graph.AddEdge("MH", "TE");
-            graph.AddEdge("AP", "TE");
+            // graph.AddEdge("KA", "TN");
+            // graph.AddEdge("KA", "GOA");
+            // graph.AddEdge("KA", "AP");
+            // graph.AddEdge("KA", "KE");
+            // graph.AddEdge("KA", "TE");
+            // graph.AddEdge("KA", "MH");
+            // graph.AddEdge("TN", "KE");
+            // graph.AddEdge("TN", "AP");
+            // graph.AddEdge("MH", "MP");
+            // graph.AddEdge("MH", "TE");
+            // graph.AddEdge("AP", "TE");
+            // graph.AddEdge("GOA", "TN");
+            // graph.AddEdge("GOA", "MH");
 
-            graph.RemoveNode("TN");
-            graph.RemoveEdge("MH", "KA");
+            // graph.RemoveNode("TN");
+            // graph.RemoveEdge("MH", "KA");
+            // graph.DepthFirstTraversalUsingIteration("GOA");
+            // Console.WriteLine("......................");
+            // graph.DepthFirstTraversal("GOA");
+            // Console.WriteLine("......................");
+            // graph.BreadthFirstTraversalUsing("GOA");
 
-            graph.Print();
+            // graph.Print();
+
+            // Graph graph = new Graph(true);
+            // graph.AddNode("X");
+            // graph.AddNode("A");
+            // graph.AddNode("B");
+            // graph.AddNode("P");
+
+            // graph.AddEdge("X", "A");
+            // graph.AddEdge("X", "B");
+            // graph.AddEdge("A", "P");
+            // graph.AddEdge("B", "P");
+
+            // var sortedList = graph.TopologicalSort();
+
+            Graph cyclicCheckGraph = new Graph(true);
+            cyclicCheckGraph.AddNode("X");
+            cyclicCheckGraph.AddNode("A");
+            cyclicCheckGraph.AddNode("B");
+            cyclicCheckGraph.AddNode("C");
+
+            cyclicCheckGraph.AddEdge("X", "A");
+            cyclicCheckGraph.AddEdge("A", "B");
+            cyclicCheckGraph.AddEdge("B", "C");
+            cyclicCheckGraph.AddEdge("C", "A");
+            Console.WriteLine(cyclicCheckGraph.HasCyclicSet());
         }
 
         public static void TrieExcercises()
